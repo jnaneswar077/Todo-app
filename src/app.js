@@ -11,7 +11,7 @@ const app = express();
 
 // Global middleware
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || "http://localhost:3000",
+  origin: process.env.CORS_ORIGIN || true,
   credentials: true,
 }));
 app.use(express.json({ limit: '10kb' }));
@@ -27,9 +27,15 @@ app.use("/api/v1/users", userRouter);
 app.use("/api/v1/todos", todoRouter);
 
 // Serve frontend
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/index.html'));
+// Serve frontend (catch-all for non-API routes)
+app.get("*", (req, res, next) => {
+  if (req.path.startsWith("/api")) {
+    // Let API routes continue to error handler if not found
+    return next();
+  }
+  res.sendFile(path.join(__dirname, "../public/index.html"));
 });
+
 
 // Global error handling middleware
 app.use((err, req, res, next) => {

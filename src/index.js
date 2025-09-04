@@ -3,8 +3,9 @@ dotenv.config({ path: "./.env" });
 
 import connectDB from "./db/index.js";
 import app from "./app.js";
-import { PORT } from "./constants.js";
+import { PORT as APP_PORT } from "./constants.js";
 
+const PORT = process.env.PORT || APP_PORT; // 👈 use platform port first
 connectDB()
   .then(() => {
     app.listen(PORT, () => {

@@ -11,7 +11,7 @@ const app = express();
 
 // Global middleware
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || true,
+  origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(",") : ["*"],
   credentials: true,
 }));
 app.use(express.json({ limit: '10kb' }));
@@ -26,13 +26,14 @@ import todoRouter from './routes/todo.routes.js';
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/todos", todoRouter);
 
-// Serve frontend
 // Serve frontend (catch-all for non-API routes)
-// Catch-all route for frontend (non-API)
-app.get(/^(?!\/api).*/, (req, res) => {
-  res.sendFile(path.join(__dirname, "../public/index.html"));
+app.use((req, res, next) => {
+  if (!req.path.startsWith("/api")) {
+    res.sendFile(path.join(__dirname, "../public/index.html"));
+  } else {
+    next();
+  }
 });
-
 
 // Global error handling middleware
 app.use((err, req, res, next) => {

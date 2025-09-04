@@ -28,11 +28,8 @@ app.use("/api/v1/todos", todoRouter);
 
 // Serve frontend
 // Serve frontend (catch-all for non-API routes)
-app.get("*", (req, res, next) => {
-  if (req.path.startsWith("/api")) {
-    // Let API routes continue to error handler if not found
-    return next();
-  }
+// Catch-all route for frontend (non-API)
+app.get(/^(?!\/api).*/, (req, res) => {
   res.sendFile(path.join(__dirname, "../public/index.html"));
 });
 

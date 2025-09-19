@@ -4,11 +4,22 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { Todo } from "../models/todo.model.js";
 
 const createTodo = asyncHandler(async (req, res) => {
-  const { title, description, priority, dueDate, tags } = req.body;
+  const { title, description, priority, dueDate, tags, reminder } = req.body;
+
+  // Debug: Log the incoming request data
+  console.log('🔍 Create Todo Request Body:', JSON.stringify(req.body, null, 2));
+  console.log('📧 Reminder Data:', reminder);
 
   if (!title || title.trim() === "") {
     throw new ApiError(400, "Title is required");
   }
+
+  // Prepare reminder object
+  const reminderData = {
+    enabled: reminder?.enabled || false,
+    minutesBefore: reminder?.minutesBefore || 60,
+    emailSent: false
+  };
 
   const todo = await Todo.create({
     title: title.trim(),
@@ -16,6 +27,7 @@ const createTodo = asyncHandler(async (req, res) => {
     priority,
     dueDate,
     tags: tags || [],
+    reminder: reminderData,
     user: req.user._id
   });
 
@@ -75,7 +87,7 @@ const getTodoById = asyncHandler(async (req, res) => {
 
 const updateTodo = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const { title, description, priority, dueDate, tags, status } = req.body;
+  const { title, description, priority, dueDate, tags, status, reminder } = req.body;
 
   const todo = await Todo.findOne({ _id: id, user: req.user._id });
 
@@ -83,18 +95,29 @@ const updateTodo = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Todo not found");
   }
 
+  // Prepare update object
+  const updateData = {
+    title: title?.trim(),
+    description: description?.trim(),
+    priority,
+    dueDate,
+    tags,
+    status
+  };
+
+  // Handle reminder update if provided
+  if (reminder !== undefined) {
+    updateData.reminder = {
+      enabled: reminder?.enabled || false,
+      minutesBefore: reminder?.minutesBefore || 60,
+      emailSent: reminder?.emailSent || false,
+      emailSentAt: reminder?.emailSentAt || undefined
+    };
+  }
+
   const updatedTodo = await Todo.findByIdAndUpdate(
     id,
-    {
-      $set: {
-        title: title?.trim(),
-        description: description?.trim(),
-        priority,
-        dueDate,
-        tags,
-        status
-      }
-    },
+    { $set: updateData },
     { new: true }
   ).populate("user", "username email");
 

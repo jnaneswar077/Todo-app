@@ -33,6 +33,25 @@ const todoSchema = new mongoose.Schema(
     completedAt: {
       type: Date
     },
+    reminder: {
+      enabled: {
+        type: Boolean,
+        default: false
+      },
+      minutesBefore: {
+        type: Number,
+        default: 60, // Default 1 hour before
+        min: 5,
+        max: 10080 // Max 1 week before
+      },
+      emailSent: {
+        type: Boolean,
+        default: false
+      },
+      emailSentAt: {
+        type: Date
+      }
+    },
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

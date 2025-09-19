@@ -228,16 +228,45 @@ async function handleAddTodo(e) {
     e.preventDefault();
     showLoading(true);
 
-    const title = document.getElementById('todoTitle').value;
-    const description = document.getElementById('todoDescription').value;
-    const priority = document.getElementById('todoPriority').value;
-    const dueDate = document.getElementById('todoDueDate').value;
-    const tags = document.getElementById('todoTags').value
-        .split(',')
-        .map(tag => tag.trim())
-        .filter(tag => tag.length > 0);
-
     try {
+        const title = document.getElementById('todoTitle').value.trim();
+        const description = document.getElementById('todoDescription').value.trim();
+        const priority = document.getElementById('todoPriority').value;
+        const dueDate = document.getElementById('todoDueDate').value;
+        const dueTime = document.getElementById('todoDueTime').value;
+        const reminderMinutes = document.getElementById('todoReminder').value;
+        const tags = document.getElementById('todoTags').value.trim();
+
+        if (!title) {
+            throw new Error('Title is required');
+        }
+
+        // Combine date and time into a proper datetime
+        let dueDatetime = null;
+        if (dueDate) {
+            if (dueTime) {
+                dueDatetime = new Date(`${dueDate}T${dueTime}`);
+            } else {
+                // If no time specified, default to 9:00 AM
+                dueDatetime = new Date(`${dueDate}T09:00`);
+            }
+        }
+
+        // Prepare reminder settings
+        const reminder = {
+            enabled: reminderMinutes ? true : false,
+            minutesBefore: reminderMinutes ? parseInt(reminderMinutes) : 60,
+            emailSent: false
+        };
+
+        const todoData = {
+            title,
+            description,
+            priority,
+            dueDate: dueDatetime ? dueDatetime.toISOString() : null,
+            reminder,
+            tags: tags ? tags.split(',').map(tag => tag.trim()).filter(tag => tag) : []
+        };
         let response;
         if (isEditMode && editingTodoId) {
             // Update existing todo
@@ -247,7 +276,7 @@ async function handleAddTodo(e) {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${accessToken}`
                 },
-                body: JSON.stringify({ title, description, priority, dueDate: dueDate || undefined, tags })
+                body: JSON.stringify(todoData)
             });
         } else {
             // Create new todo
@@ -257,7 +286,7 @@ async function handleAddTodo(e) {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${accessToken}`
                 },
-                body: JSON.stringify({ title, description, priority, dueDate: dueDate || undefined, tags })
+                body: JSON.stringify(todoData)
             });
         }
 
@@ -294,6 +323,11 @@ function hideAddTodoForm() {
     document.getElementById('addNewTodoBtn').style.display = 'block';
     document.getElementById('addTodoFormContainer').style.display = 'none';
     document.getElementById('addTodoForm').reset();
+    
+    // Reset time and reminder to defaults
+    document.getElementById('todoDueTime').value = '09:00';
+    document.getElementById('todoReminder').value = '60'; // Default 1 hour
+    
     // Reset edit state when hiding
     isEditMode = false;
     editingTodoId = null;
@@ -495,7 +529,29 @@ async function editTodo(todoId) {
         document.getElementById('todoTitle').value = todo.title || '';
         document.getElementById('todoDescription').value = todo.description || '';
         document.getElementById('todoPriority').value = todo.priority || 'medium';
-        document.getElementById('todoDueDate').value = todo.dueDate ? new Date(todo.dueDate).toISOString().slice(0,10) : '';
+        
+        // Handle due date and time
+        if (todo.dueDate) {
+            const dueDate = new Date(todo.dueDate);
+            // Format date as YYYY-MM-DD
+            const dateStr = dueDate.toISOString().split('T')[0];
+            document.getElementById('todoDueDate').value = dateStr;
+            
+            // Format time as HH:MM
+            const timeStr = dueDate.toTimeString().slice(0, 5);
+            document.getElementById('todoDueTime').value = timeStr;
+        } else {
+            document.getElementById('todoDueDate').value = '';
+            document.getElementById('todoDueTime').value = '09:00';
+        }
+        
+        // Handle reminder settings
+        if (todo.reminder && todo.reminder.enabled) {
+            document.getElementById('todoReminder').value = todo.reminder.minutesBefore || 60;
+        } else {
+            document.getElementById('todoReminder').value = '';
+        }
+        
         document.getElementById('todoTags').value = Array.isArray(todo.tags) ? todo.tags.join(', ') : '';
 
         // Switch to edit mode

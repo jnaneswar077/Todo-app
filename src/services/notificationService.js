@@ -15,9 +15,9 @@ class NotificationService {
             return;
         }
 
-        // Run every hour to check for due date reminders
-        cron.schedule('0 * * * *', async () => {
-            console.log('Running due date reminder check...');
+        // Run every 15 minutes to check for due date reminders (more responsive)
+        cron.schedule('*/15 * * * *', async () => {
+            console.log('🔍 Checking for due date reminders...');
             await this.checkDueDateReminders();
         });
 
@@ -48,44 +48,42 @@ class NotificationService {
         try {
             const now = new Date();
             
-            // Get all users with email notifications enabled
-            const users = await User.find({
-                'emailNotifications.enabled': true,
-                'emailNotifications.dueDateReminder': true
-            });
+            // Find todos with individual reminders enabled that haven't been sent yet
+            const todosWithReminders = await Todo.find({
+                status: { $ne: 'completed' },
+                dueDate: { $exists: true, $ne: null },
+                'reminder.enabled': true,
+                'reminder.emailSent': false,
+                dueDate: { $gt: now } // Only future todos
+            }).populate('user', 'username email emailNotifications');
 
-            for (const user of users) {
-                const reminderHours = user.emailNotifications.reminderHours || 24;
-                const reminderTime = new Date(now.getTime() + (reminderHours * 60 * 60 * 1000));
+            for (const todo of todosWithReminders) {
+                // Skip if user has disabled email notifications
+                if (!todo.user.emailNotifications?.enabled || !todo.user.emailNotifications?.dueDateReminder) {
+                    continue;
+                }
 
-                // Find todos that are due within the reminder window
-                const todosDueSoon = await Todo.find({
-                    user: user._id,
-                    status: { $ne: 'completed' },
-                    dueDate: {
-                        $gte: now,
-                        $lte: reminderTime
-                    }
-                });
-
-                for (const todo of todosDueSoon) {
-                    const reminderKey = `${user._id}-${todo._id}-reminder`;
-                    
-                    // Check if we've already sent a reminder for this todo
-                    if (!this.sentReminders.has(reminderKey)) {
-                        try {
-                            const emailService = getEmailService();
-                            await emailService.sendDueDateReminder(
-                                user.email,
-                                user.username,
-                                todo
-                            );
-                            
-                            this.sentReminders.add(reminderKey);
-                            console.log(`Sent due date reminder to ${user.email} for todo: ${todo.title}`);
-                        } catch (error) {
-                            console.error(`Failed to send reminder to ${user.email}:`, error);
-                        }
+                const dueDate = new Date(todo.dueDate);
+                const reminderTime = new Date(dueDate.getTime() - (todo.reminder.minutesBefore * 60 * 1000));
+                
+                // Check if it's time to send the reminder
+                if (now >= reminderTime) {
+                    try {
+                        const emailService = getEmailService();
+                        await emailService.sendDueDateReminder(
+                            todo.user.email,
+                            todo.user.username,
+                            todo
+                        );
+                        
+                        // Mark reminder as sent
+                        todo.reminder.emailSent = true;
+                        todo.reminder.emailSentAt = now;
+                        await todo.save();
+                        
+                        console.log(`✅ Sent personalized reminder to ${todo.user.email} for todo: ${todo.title} (${todo.reminder.minutesBefore} min before)`);
+                    } catch (error) {
+                        console.error(`❌ Failed to send reminder to ${todo.user.email}:`, error);
                     }
                 }
             }

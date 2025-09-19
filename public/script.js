@@ -282,6 +282,9 @@ async function loadTodos(page = 1) {
             ...currentFilters
         });
 
+        console.log('Loading todos with filters:', currentFilters); // Debug log
+        console.log('Query params:', queryParams.toString()); // Debug log
+
         const response = await fetch(`${API_BASE}/todos?${queryParams}`, {
             headers: {
                 'Authorization': `Bearer ${accessToken}`
@@ -484,7 +487,11 @@ async function editTodo(todoId) {
 // Filter and Search Functions
 function handleSearch(e) {
     const searchTerm = e.target.value.trim();
-    currentFilters.search = searchTerm || undefined;
+    if (searchTerm && searchTerm !== '') {
+        currentFilters.search = searchTerm;
+    } else {
+        delete currentFilters.search;
+    }
     loadTodos(1);
 }
 
@@ -492,9 +499,20 @@ function handleFilterChange() {
     const statusFilter = document.getElementById('statusFilter').value;
     const priorityFilter = document.getElementById('priorityFilter').value;
 
-    currentFilters.status = statusFilter || undefined;
-    currentFilters.priority = priorityFilter || undefined;
+    // Only add filters if they have actual values (not empty strings)
+    if (statusFilter && statusFilter.trim() !== '') {
+        currentFilters.status = statusFilter;
+    } else {
+        delete currentFilters.status;
+    }
     
+    if (priorityFilter && priorityFilter.trim() !== '') {
+        currentFilters.priority = priorityFilter;
+    } else {
+        delete currentFilters.priority;
+    }
+    
+    console.log('Current filters:', currentFilters); // Debug log
     loadTodos(1);
 }
 

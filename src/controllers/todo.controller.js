@@ -34,8 +34,8 @@ const getUserTodos = asyncHandler(async (req, res) => {
   const { page = 1, limit = 10, status, priority, search } = req.query;
   
   const filters = {};
-  if (status) filters.status = status;
-  if (priority) filters.priority = priority;
+  if (status) filters.status = { $regex: `^${status}$`, $options: "i" };
+  if (priority) filters.priority = { $regex: `^${priority}$`, $options: "i" };
   if (search) {
     filters.$or = [
       { title: { $regex: search, $options: "i" } },

@@ -439,9 +439,9 @@ REFRESH_TOKEN_EXPIRY=7d     # Refresh token expiry
 - [x] Real-time edit functionality
 - [x] Responsive glassmorphism UI
 - [x] Case-insensitive filtering
+- [x] **Dark Mode Theme**: Toggle between light and dark themes with localStorage persistence
 
 ### 🚧 Planned Features
-- [ ] **Dark Mode Theme**: Toggle between light and dark themes
 - [ ] **Todo Categories**: Organize todos into custom categories
 - [ ] **File Attachments**: Add files and images to todos
 - [ ] **Collaborative Todos**: Share todos with other users

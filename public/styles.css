@@ -1,3 +1,88 @@
+/* CSS Variables for Theming */
+:root {
+    /* Light Theme Colors */
+    --bg-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --bg-secondary: rgba(255, 255, 255, 0.95);
+    --bg-tertiary: #f8f9fa;
+    --bg-glass: rgba(255, 255, 255, 0.95);
+    
+    --text-primary: #333;
+    --text-secondary: #555;
+    --text-tertiary: #666;
+    --text-muted: #6c757d;
+    
+    --border-color: #e1e5e9;
+    --border-secondary: #e9ecef;
+    --border-focus: #667eea;
+    
+    --shadow-light: rgba(0, 0, 0, 0.1);
+    --shadow-medium: rgba(0, 0, 0, 0.15);
+    
+    --accent-primary: #667eea;
+    --accent-secondary: #764ba2;
+    --success-color: #28a745;
+    --warning-color: #ffc107;
+    --danger-color: #dc3545;
+    
+    /* Priority Colors */
+    --priority-high-bg: #ffebee;
+    --priority-high-text: #c62828;
+    --priority-medium-bg: #fff3e0;
+    --priority-medium-text: #ef6c00;
+    --priority-low-bg: #e8f5e8;
+    --priority-low-text: #2e7d32;
+    
+    /* Status Colors */
+    --status-pending-bg: #fff3e0;
+    --status-pending-text: #ef6c00;
+    --status-progress-bg: #e3f2fd;
+    --status-progress-text: #1565c0;
+    --status-completed-bg: #e8f5e8;
+    --status-completed-text: #2e7d32;
+}
+
+/* Dark Theme Colors */
+[data-theme="dark"] {
+    --bg-primary: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    --bg-secondary: rgba(30, 30, 30, 0.95);
+    --bg-tertiary: #2d2d2d;
+    --bg-glass: rgba(40, 40, 40, 0.95);
+    
+    --text-primary: #e0e0e0;
+    --text-secondary: #b0b0b0;
+    --text-tertiary: #a0a0a0;
+    --text-muted: #888;
+    
+    --border-color: #404040;
+    --border-secondary: #505050;
+    --border-focus: #667eea;
+    
+    --shadow-light: rgba(0, 0, 0, 0.3);
+    --shadow-medium: rgba(0, 0, 0, 0.5);
+    
+    --accent-primary: #667eea;
+    --accent-secondary: #764ba2;
+    --success-color: #4caf50;
+    --warning-color: #ff9800;
+    --danger-color: #f44336;
+    
+    /* Priority Colors - Dark Mode */
+    --priority-high-bg: rgba(244, 67, 54, 0.2);
+    --priority-high-text: #ff6b6b;
+    --priority-medium-bg: rgba(255, 152, 0, 0.2);
+    --priority-medium-text: #ffb74d;
+    --priority-low-bg: rgba(76, 175, 80, 0.2);
+    --priority-low-text: #81c784;
+    
+    /* Status Colors - Dark Mode */
+    --status-pending-bg: rgba(255, 152, 0, 0.2);
+    --status-pending-text: #ffb74d;
+    --status-progress-bg: rgba(33, 150, 243, 0.2);
+    --status-progress-text: #64b5f6;
+    --status-completed-bg: rgba(76, 175, 80, 0.2);
+    --status-completed-text: #81c784;
+}
+
 /* Reset and Base Styles */
 * {
     margin: 0;
@@ -7,9 +92,10 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: var(--bg-primary);
     min-height: 100vh;
-    color: #333;
+    color: var(--text-primary);
+    transition: background 0.3s ease, color 0.3s ease;
 }
 
 .container {
@@ -20,7 +106,7 @@ body {
 
 /* Header Styles */
 .header {
-    background: rgba(255, 255, 255, 0.95);
+    background: var(--bg-glass);
     backdrop-filter: blur(10px);
     border-radius: 15px;
     padding: 20px;
@@ -28,18 +114,25 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 8px 32px var(--shadow-light);
+    transition: background 0.3s ease, box-shadow 0.3s ease;
 }
 
 .header h1 {
-    color: #667eea;
+    color: var(--accent-primary);
     font-size: 2rem;
     font-weight: 700;
 }
 
 .header h1 i {
     margin-right: 10px;
-    color: #4CAF50;
+    color: var(--success-color);
+}
+
+.header-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
 }
 
 .user-info {
@@ -50,7 +143,44 @@ body {
 
 .user-info span {
     font-weight: 600;
-    color: #555;
+    color: var(--text-secondary);
+}
+
+/* Theme Toggle Button */
+.theme-toggle {
+    background: var(--bg-tertiary);
+    border: 2px solid var(--border-color);
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: var(--text-primary);
+    font-size: 1.1rem;
+}
+
+.theme-toggle:hover {
+    background: var(--accent-primary);
+    color: white;
+    border-color: var(--accent-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px var(--shadow-medium);
+}
+
+.theme-toggle:active {
+    transform: translateY(0);
+}
+
+/* Theme toggle icon animation */
+.theme-toggle i {
+    transition: transform 0.3s ease;
+}
+
+.theme-toggle:hover i {
+    transform: rotate(15deg);
 }
 
 /* Button Styles */
@@ -67,72 +197,73 @@ body {
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
     color: white;
 }
 
 .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 5px 15px var(--shadow-medium);
 }
 
 .btn-secondary {
-    background: #6c757d;
+    background: var(--text-muted);
     color: white;
 }
 
 .btn-secondary:hover {
-    background: #5a6268;
+    background: var(--text-tertiary);
     transform: translateY(-2px);
 }
 
 .btn-success {
-    background: #28a745;
+    background: var(--success-color);
     color: white;
 }
 
 .btn-success:hover {
-    background: #218838;
+    opacity: 0.9;
     transform: translateY(-2px);
 }
 
 .btn-danger {
-    background: #dc3545;
+    background: var(--danger-color);
     color: white;
 }
 
 .btn-danger:hover {
-    background: #c82333;
+    opacity: 0.9;
     transform: translateY(-2px);
 }
 
 .btn-warning {
-    background: #ffc107;
-    color: #212529;
+    background: var(--warning-color);
+    color: var(--text-primary);
 }
 
 .btn-warning:hover {
-    background: #e0a800;
+    opacity: 0.9;
     transform: translateY(-2px);
 }
 
 /* Auth Container Styles */
 .auth-container {
-    background: rgba(255, 255, 255, 0.95);
+    background: var(--bg-glass);
     backdrop-filter: blur(10px);
     border-radius: 15px;
     padding: 40px;
     margin-bottom: 30px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 8px 32px var(--shadow-light);
     max-width: 500px;
     margin-left: auto;
     margin-right: auto;
+    transition: background 0.3s ease, box-shadow 0.3s ease;
 }
 
 .auth-form h2 {
     text-align: center;
     margin-bottom: 30px;
-    color: #667eea;
+    color: var(--accent-primary);
     font-size: 1.8rem;
 }
 
@@ -144,7 +275,7 @@ body {
     display: block;
     margin-bottom: 8px;
     font-weight: 600;
-    color: #555;
+    color: var(--text-secondary);
 }
 
 .form-group input,
@@ -152,27 +283,30 @@ body {
 .form-group textarea {
     width: 100%;
     padding: 12px;
-    border: 2px solid #e1e5e9;
+    border: 2px solid var(--border-color);
     border-radius: 8px;
     font-size: 16px;
-    transition: border-color 0.3s ease;
+    transition: border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
 }
 
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: var(--border-focus);
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
 .auth-form p {
     text-align: center;
     margin-top: 20px;
+    color: var(--text-primary);
 }
 
 .auth-form a {
-    color: #667eea;
+    color: var(--accent-primary);
     text-decoration: none;
     font-weight: 600;
 }
@@ -183,11 +317,12 @@ body {
 
 /* Todo App Styles */
 .todo-app {
-    background: rgba(255, 255, 255, 0.95);
+    background: var(--bg-glass);
     backdrop-filter: blur(10px);
     border-radius: 15px;
     padding: 30px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 8px 32px var(--shadow-light);
+    transition: background 0.3s ease, box-shadow 0.3s ease;
 }
 
 .add-todo-button-container {
@@ -202,11 +337,12 @@ body {
 }
 
 .add-todo-form {
-    background: #f8f9fa;
+    background: var(--bg-tertiary);
     border-radius: 12px;
     padding: 25px;
     margin-bottom: 30px;
-    border: 1px solid #e9ecef;
+    border: 1px solid var(--border-secondary);
+    transition: background 0.3s ease, border-color 0.3s ease;
 }
 
 .add-todo-form .form-header {
@@ -217,7 +353,7 @@ body {
 }
 
 .add-todo-form h3 {
-    color: #667eea;
+    color: var(--accent-primary);
     margin-bottom: 0;
     font-size: 1.4rem;
 }
@@ -252,9 +388,17 @@ body {
 .search-box input {
     width: 100%;
     padding: 12px 40px 12px 15px;
-    border: 2px solid #e1e5e9;
+    border: 2px solid var(--border-color);
     border-radius: 8px;
     font-size: 16px;
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+    transition: border-color 0.3s ease, background-color 0.3s ease;
+}
+
+.search-box input:focus {
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
 .search-box i {
@@ -262,7 +406,7 @@ body {
     right: 15px;
     top: 50%;
     transform: translateY(-50%);
-    color: #6c757d;
+    color: var(--text-muted);
 }
 
 .filter-options {
@@ -272,10 +416,17 @@ body {
 
 .filter-options select {
     padding: 10px 15px;
-    border: 2px solid #e1e5e9;
+    border: 2px solid var(--border-color);
     border-radius: 8px;
-    background: white;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
     font-size: 14px;
+    transition: border-color 0.3s ease, background-color 0.3s ease;
+}
+
+.filter-options select:focus {
+    border-color: var(--border-focus);
+    outline: none;
 }
 
 /* Todo Item Styles */
@@ -286,27 +437,27 @@ body {
 }
 
 .todo-item {
-    background: white;
+    background: var(--bg-secondary);
     border-radius: 12px;
     padding: 20px;
-    border: 1px solid #e9ecef;
+    border: 1px solid var(--border-secondary);
     transition: all 0.3s ease;
     position: relative;
 }
 
 .todo-item:hover {
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 5px 15px var(--shadow-medium);
 }
 
 .todo-item.completed {
-    background: #f8f9fa;
+    background: var(--bg-tertiary);
     opacity: 0.8;
 }
 
 .todo-item.completed .todo-title {
     text-decoration: line-through;
-    color: #6c757d;
+    color: var(--text-muted);
 }
 
 .todo-header {
@@ -319,7 +470,7 @@ body {
 .todo-title {
     font-size: 1.2rem;
     font-weight: 600;
-    color: #333;
+    color: var(--text-primary);
     margin-bottom: 5px;
 }
 
@@ -340,18 +491,18 @@ body {
 }
 
 .todo-priority.high {
-    background: #ffebee;
-    color: #c62828;
+    background: var(--priority-high-bg);
+    color: var(--priority-high-text);
 }
 
 .todo-priority.medium {
-    background: #fff3e0;
-    color: #ef6c00;
+    background: var(--priority-medium-bg);
+    color: var(--priority-medium-text);
 }
 
 .todo-priority.low {
-    background: #e8f5e8;
-    color: #2e7d32;
+    background: var(--priority-low-bg);
+    color: var(--priority-low-text);
 }
 
 .todo-status {
@@ -363,22 +514,22 @@ body {
 }
 
 .todo-status.pending {
-    background: #fff3e0;
-    color: #ef6c00;
+    background: var(--status-pending-bg);
+    color: var(--status-pending-text);
 }
 
 .todo-status.in_progress {
-    background: #e3f2fd;
-    color: #1565c0;
+    background: var(--status-progress-bg);
+    color: var(--status-progress-text);
 }
 
 .todo-status.completed {
-    background: #e8f5e8;
-    color: #2e7d32;
+    background: var(--status-completed-bg);
+    color: var(--status-completed-text);
 }
 
 .todo-description {
-    color: #666;
+    color: var(--text-tertiary);
     margin-bottom: 15px;
     line-height: 1.5;
 }
@@ -391,8 +542,8 @@ body {
 }
 
 .todo-tag {
-    background: #e9ecef;
-    color: #495057;
+    background: var(--border-secondary);
+    color: var(--text-secondary);
     padding: 4px 8px;
     border-radius: 12px;
     font-size: 12px;
@@ -420,23 +571,23 @@ body {
 
 .pagination button {
     padding: 8px 15px;
-    border: 1px solid #dee2e6;
-    background: white;
-    color: #495057;
+    border: 1px solid var(--border-color);
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
     border-radius: 6px;
     cursor: pointer;
     transition: all 0.3s ease;
 }
 
 .pagination button:hover {
-    background: #e9ecef;
-    border-color: #adb5bd;
+    background: var(--bg-tertiary);
+    border-color: var(--border-secondary);
 }
 
 .pagination button.active {
-    background: #667eea;
+    background: var(--accent-primary);
     color: white;
-    border-color: #667eea;
+    border-color: var(--accent-primary);
 }
 
 .pagination button:disabled {
@@ -446,22 +597,28 @@ body {
 
 /* Loading Styles */
 .loading {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 40px;
-    color: #667eea;
+    z-index: 9999;
+    color: white;
 }
 
 .spinner {
-    width: 40px;
-    height: 40px;
-    border: 4px solid #f3f3f3;
-    border-top: 4px solid #667eea;
+    width: 50px;
+    height: 50px;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-top: 4px solid white;
     border-radius: 50%;
     animation: spin 1s linear infinite;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
 }
 
 @keyframes spin {
@@ -478,9 +635,11 @@ body {
     border-radius: 8px;
     color: white;
     font-weight: 600;
-    z-index: 1000;
+    z-index: 10000;
     transform: translateX(400px);
     transition: transform 0.3s ease;
+    min-width: 250px;
+    box-shadow: 0 5px 15px var(--shadow-medium);
 }
 
 .toast.show {
@@ -488,15 +647,31 @@ body {
 }
 
 .toast.success {
-    background: #28a745;
+    background: var(--success-color);
 }
 
 .toast.error {
-    background: #dc3545;
+    background: var(--danger-color);
 }
 
 .toast.info {
-    background: #17a2b8;
+    background: var(--accent-primary);
+}
+
+.toast.warning {
+    background: var(--warning-color);
+    color: var(--text-primary);
+}
+
+/* No todos message */
+.no-todos {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    background: var(--bg-tertiary);
+    border-radius: 12px;
+    border: 2px dashed var(--border-color);
 }
 
 /* Responsive Design */
@@ -509,6 +684,11 @@ body {
         flex-direction: column;
         gap: 15px;
         text-align: center;
+    }
+    
+    .header-controls {
+        justify-content: center;
+        flex-wrap: wrap;
     }
     
     .form-row {

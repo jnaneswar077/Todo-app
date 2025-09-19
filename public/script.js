@@ -6,6 +6,8 @@ let currentFilters = {};
 // Edit mode state
 let isEditMode = false;
 let editingTodoId = null;
+// Theme state
+let currentTheme = 'light';
 
 // DOM elements
 const authForms = document.getElementById('authForms');
@@ -19,6 +21,8 @@ const loading = document.getElementById('loading');
 const toast = document.getElementById('toast');
 // Add Todo/Edit Todo elements
 const todoSubmitBtn = document.getElementById('todoSubmitBtn');
+// Theme toggle element
+const themeToggle = document.getElementById('themeToggle');
 
 // API base URL
 const API_BASE = '/api/v1';
@@ -30,6 +34,9 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function initializeApp() {
+    // Initialize theme
+    initializeTheme();
+    
     // Check if user is already logged in
     const token = localStorage.getItem('accessToken');
     if (token) {
@@ -61,6 +68,9 @@ function setupEventListeners() {
     // Add New Todo button toggle
     document.getElementById('addNewTodoBtn').addEventListener('click', showAddTodoForm);
     document.getElementById('cancelAddTodoBtn').addEventListener('click', hideAddTodoForm);
+
+    // Theme toggle
+    themeToggle.addEventListener('click', toggleTheme);
 
     // Filters and search
     document.getElementById('searchInput').addEventListener('input', debounce(handleSearch, 500));
@@ -564,4 +574,46 @@ function debounce(func, wait) {
         clearTimeout(timeout);
         timeout = setTimeout(later, wait);
     };
+}
+
+// Theme Functions
+function initializeTheme() {
+    // Get saved theme from localStorage or default to light
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    currentTheme = savedTheme;
+    
+    // Apply theme to document
+    document.documentElement.setAttribute('data-theme', currentTheme);
+    
+    // Update theme toggle icon
+    updateThemeToggleIcon();
+}
+
+function toggleTheme() {
+    // Switch between light and dark themes
+    currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+    
+    // Apply theme to document
+    document.documentElement.setAttribute('data-theme', currentTheme);
+    
+    // Save theme preference
+    localStorage.setItem('theme', currentTheme);
+    
+    // Update theme toggle icon
+    updateThemeToggleIcon();
+    
+    // Show toast notification
+    const themeText = currentTheme === 'dark' ? 'Dark' : 'Light';
+    showToast(`Switched to ${themeText} mode`, 'info');
+}
+
+function updateThemeToggleIcon() {
+    const icon = themeToggle.querySelector('i');
+    if (currentTheme === 'dark') {
+        icon.className = 'fas fa-sun';
+        themeToggle.title = 'Switch to Light Mode';
+    } else {
+        icon.className = 'fas fa-moon';
+        themeToggle.title = 'Switch to Dark Mode';
+    }
 }

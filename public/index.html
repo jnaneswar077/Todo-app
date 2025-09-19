@@ -61,9 +61,21 @@
 
         <!-- Todo App (Hidden until authenticated) -->
         <div id="todoApp" class="todo-app" style="display: none;">
+            <!-- Add New Todo Button -->
+            <div class="add-todo-button-container">
+                <button id="addNewTodoBtn" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Add New Todo
+                </button>
+            </div>
+
             <!-- Add Todo Form -->
-            <div class="add-todo-form">
-                <h3>Add New Todo</h3>
+            <div id="addTodoFormContainer" class="add-todo-form" style="display: none;">
+                <div class="form-header">
+                    <h3>Add New Todo</h3>
+                    <button id="cancelAddTodoBtn" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                </div>
                 <form id="addTodoForm">
                     <div class="form-row">
                         <div class="form-group">

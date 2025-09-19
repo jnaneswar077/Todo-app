@@ -53,6 +53,10 @@ function setupEventListeners() {
     // Todo form
     document.getElementById('addTodoForm').addEventListener('submit', handleAddTodo);
 
+    // Add New Todo button toggle
+    document.getElementById('addNewTodoBtn').addEventListener('click', showAddTodoForm);
+    document.getElementById('cancelAddTodoBtn').addEventListener('click', hideAddTodoForm);
+
     // Filters and search
     document.getElementById('searchInput').addEventListener('input', debounce(handleSearch, 500));
     document.getElementById('statusFilter').addEventListener('change', handleFilterChange);
@@ -220,6 +224,7 @@ async function handleAddTodo(e) {
         if (data.success) {
             showToast('Todo created successfully!', 'success');
             document.getElementById('addTodoForm').reset();
+            hideAddTodoForm();
             loadTodos();
         } else {
             showToast(data.message || 'Failed to create todo', 'error');
@@ -230,6 +235,18 @@ async function handleAddTodo(e) {
     } finally {
         showLoading(false);
     }
+}
+
+// Toggle Add Todo Form Functions
+function showAddTodoForm() {
+    document.getElementById('addNewTodoBtn').style.display = 'none';
+    document.getElementById('addTodoFormContainer').style.display = 'block';
+}
+
+function hideAddTodoForm() {
+    document.getElementById('addNewTodoBtn').style.display = 'block';
+    document.getElementById('addTodoFormContainer').style.display = 'none';
+    document.getElementById('addTodoForm').reset();
 }
 
 async function loadTodos(page = 1) {

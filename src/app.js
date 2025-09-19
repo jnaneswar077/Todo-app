@@ -22,9 +22,11 @@ app.use(cookieParser());
 // Route mounting
 import userRouter from './routes/user.routes.js';
 import todoRouter from './routes/todo.routes.js';
+import testRouter from './routes/test.routes.js';
 
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/todos", todoRouter);
+app.use("/api/v1/test", testRouter);
 
 // Serve frontend (catch-all for non-API routes)
 app.use((req, res, next) => {

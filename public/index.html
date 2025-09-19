@@ -17,6 +17,9 @@
                     <i class="fas fa-moon"></i>
                 </button>
                 <div class="user-info" id="userInfo" style="display: none;">
+                    <button id="settingsBtn" class="settings-btn" title="Settings">
+                        <i class="fas fa-cog"></i>
+                    </button>
                     <span id="username"></span>
                     <button id="logoutBtn" class="btn btn-secondary">Logout</button>
                 </div>
@@ -143,6 +146,72 @@
                 </div>
                 <div id="pagination" class="pagination">
                     <!-- Pagination will be dynamically added here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Modal -->
+        <div id="settingsModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3><i class="fas fa-cog"></i> Settings</h3>
+                    <button id="closeSettingsBtn" class="close-btn">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="settings-section">
+                        <h4><i class="fas fa-envelope"></i> Email Notifications</h4>
+                        <div class="setting-item">
+                            <label class="switch">
+                                <input type="checkbox" id="emailNotificationsEnabled">
+                                <span class="slider"></span>
+                            </label>
+                            <div class="setting-info">
+                                <strong>Enable Email Notifications</strong>
+                                <p>Receive email notifications for your todos</p>
+                            </div>
+                        </div>
+                        
+                        <div class="setting-item">
+                            <label class="switch">
+                                <input type="checkbox" id="dueDateReminders">
+                                <span class="slider"></span>
+                            </label>
+                            <div class="setting-info">
+                                <strong>Due Date Reminders</strong>
+                                <p>Get reminded before your todos are due</p>
+                            </div>
+                        </div>
+                        
+                        <div class="setting-item">
+                            <label class="switch">
+                                <input type="checkbox" id="overdueNotifications">
+                                <span class="slider"></span>
+                            </label>
+                            <div class="setting-info">
+                                <strong>Overdue Notifications</strong>
+                                <p>Get notified when todos become overdue</p>
+                            </div>
+                        </div>
+                        
+                        <div class="setting-item">
+                            <label for="reminderHours">Reminder Time (hours before due date):</label>
+                            <select id="reminderHours">
+                                <option value="1">1 hour</option>
+                                <option value="6">6 hours</option>
+                                <option value="12">12 hours</option>
+                                <option value="24" selected>24 hours (1 day)</option>
+                                <option value="48">48 hours (2 days)</option>
+                                <option value="72">72 hours (3 days)</option>
+                                <option value="168">168 hours (1 week)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="saveSettingsBtn" class="btn btn-primary">Save Settings</button>
+                    <button id="cancelSettingsBtn" class="btn btn-secondary">Cancel</button>
                 </div>
             </div>
         </div>

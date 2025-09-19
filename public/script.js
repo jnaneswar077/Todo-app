@@ -23,6 +23,12 @@ const toast = document.getElementById('toast');
 const todoSubmitBtn = document.getElementById('todoSubmitBtn');
 // Theme toggle element
 const themeToggle = document.getElementById('themeToggle');
+// Settings elements
+const settingsBtn = document.getElementById('settingsBtn');
+const settingsModal = document.getElementById('settingsModal');
+const closeSettingsBtn = document.getElementById('closeSettingsBtn');
+const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+const cancelSettingsBtn = document.getElementById('cancelSettingsBtn');
 
 // API base URL
 const API_BASE = '/api/v1';
@@ -71,6 +77,19 @@ function setupEventListeners() {
 
     // Theme toggle
     themeToggle.addEventListener('click', toggleTheme);
+
+    // Settings modal
+    settingsBtn.addEventListener('click', showSettingsModal);
+    closeSettingsBtn.addEventListener('click', hideSettingsModal);
+    cancelSettingsBtn.addEventListener('click', hideSettingsModal);
+    saveSettingsBtn.addEventListener('click', saveEmailSettings);
+
+    // Close modal when clicking outside
+    settingsModal.addEventListener('click', (e) => {
+        if (e.target === settingsModal) {
+            hideSettingsModal();
+        }
+    });
 
     // Filters and search
     document.getElementById('searchInput').addEventListener('input', debounce(handleSearch, 500));
@@ -615,5 +634,86 @@ function updateThemeToggleIcon() {
     } else {
         icon.className = 'fas fa-moon';
         themeToggle.title = 'Switch to Dark Mode';
+    }
+}
+
+// Settings Modal Functions
+async function showSettingsModal() {
+    try {
+        // Load current email notification settings
+        await loadEmailSettings();
+        settingsModal.classList.add('show');
+        settingsModal.style.display = 'flex';
+    } catch (error) {
+        console.error('Error loading settings:', error);
+        showToast('Failed to load settings', 'error');
+    }
+}
+
+function hideSettingsModal() {
+    settingsModal.classList.remove('show');
+    setTimeout(() => {
+        settingsModal.style.display = 'none';
+    }, 300);
+}
+
+async function loadEmailSettings() {
+    try {
+        const response = await fetch(`${API_BASE}/users/email-notifications`, {
+            headers: {
+                'Authorization': `Bearer ${accessToken}`
+            }
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            const settings = data.data;
+            document.getElementById('emailNotificationsEnabled').checked = settings.enabled;
+            document.getElementById('dueDateReminders').checked = settings.dueDateReminder;
+            document.getElementById('overdueNotifications').checked = settings.overdueNotification;
+            document.getElementById('reminderHours').value = settings.reminderHours;
+        } else {
+            throw new Error(data.message || 'Failed to load email settings');
+        }
+    } catch (error) {
+        console.error('Error loading email settings:', error);
+        throw error;
+    }
+}
+
+async function saveEmailSettings() {
+    try {
+        showLoading(true);
+
+        const settings = {
+            enabled: document.getElementById('emailNotificationsEnabled').checked,
+            dueDateReminder: document.getElementById('dueDateReminders').checked,
+            overdueNotification: document.getElementById('overdueNotifications').checked,
+            reminderHours: parseInt(document.getElementById('reminderHours').value)
+        };
+
+        const response = await fetch(`${API_BASE}/users/email-notifications`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${accessToken}`
+            },
+            body: JSON.stringify(settings)
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            showToast('Email notification settings saved successfully!', 'success');
+            hideSettingsModal();
+        } else {
+            throw new Error(data.message || 'Failed to save email settings');
+        }
+    } catch (error) {
+        console.error('Error saving email settings:', error);
+        showToast('Failed to save email settings', 'error');
+    } finally {
+        showLoading(false);
     }
 }

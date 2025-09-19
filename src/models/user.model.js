@@ -29,6 +29,26 @@ const userSchema = new mongoose.Schema(
     },
     refreshToken: {
       type: String
+    },
+    emailNotifications: {
+      enabled: {
+        type: Boolean,
+        default: true
+      },
+      dueDateReminder: {
+        type: Boolean,
+        default: true
+      },
+      overdueNotification: {
+        type: Boolean,
+        default: true
+      },
+      reminderHours: {
+        type: Number,
+        default: 24, // Send reminder 24 hours before due date
+        min: 1,
+        max: 168 // Max 1 week before
+      }
     }
   },
   { timestamps: true }

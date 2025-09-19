@@ -40,6 +40,7 @@ This is a complete fullstack Todo application built with modern web technologies
 - **Pagination** for large todo lists
 - **Responsive Design** for all devices
 - **Toast Notifications** for user feedback
+- **Email Notifications** with customizable settings and beautiful HTML templates
 
 ### 🎨 User Interface
 - **Modern Glassmorphism Design** with backdrop blur effects
@@ -176,9 +177,18 @@ Before running this application, ensure you have:
    ACCESS_TOKEN_EXPIRY=15m
    REFRESH_TOKEN_SECRET=your_super_secret_refresh_token_key_here
    REFRESH_TOKEN_EXPIRY=7d
+   
+   # Email Configuration
+   EMAIL_SERVICE=gmail
+   EMAIL_USER=your-email@gmail.com
+   EMAIL_PASSWORD=your-app-password
+   EMAIL_FROM_NAME=Todo App
+   FRONTEND_URL=http://localhost:8000
    ```
 
    > **🔐 Security Note**: Replace the JWT secrets with strong, unique values in production!
+   
+   > **📧 Email Setup**: For Gmail, use an App Password instead of your regular password. Enable 2FA and generate an App Password in your Google Account settings.
 
 4. **🗄️ Database Setup**
    
@@ -234,6 +244,8 @@ Before running this application, ensure you have:
 | `POST` | `/api/v1/users/login` | User login | ❌ |
 | `POST` | `/api/v1/users/logout` | User logout | ✅ |
 | `GET` | `/api/v1/users/me` | Get current user profile | ✅ |
+| `GET` | `/api/v1/users/email-notifications` | Get email notification settings | ✅ |
+| `PUT` | `/api/v1/users/email-notifications` | Update email notification settings | ✅ |
 
 ### 📋 Todo Management Endpoints
 
@@ -291,6 +303,31 @@ POST /api/v1/todos
 }
 ```
 
+**Update Email Notification Settings:**
+```json
+PUT /api/v1/users/email-notifications
+{
+  "enabled": true,
+  "dueDateReminder": true,
+  "overdueNotification": false,
+  "reminderHours": 24
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Email notification settings updated successfully",
+  "data": {
+    "enabled": true,
+    "dueDateReminder": true,
+    "overdueNotification": false,
+    "reminderHours": 24
+  }
+}
+```
+
 ## 🔐 Authentication System
 
 ### JWT Token Flow
@@ -321,6 +358,34 @@ sequenceDiagram
 - **Protected Routes**: Middleware-based authentication
 - **Token Expiry**: Configurable token lifetimes
 - **CORS Protection**: Cross-origin request handling
+
+## 📧 Email Notification System
+
+### Features
+- **📅 Due Date Reminders**: Get notified before todos are due
+- **⚠️ Overdue Notifications**: Alerts for overdue tasks
+- **🎨 Beautiful HTML Templates**: Professional email design
+- **⚙️ Customizable Settings**: User-controlled preferences
+- **🕐 Flexible Timing**: Configure reminder hours (1-168 hours before due date)
+- **🔄 Automated Scheduling**: Cron jobs for reliable delivery
+
+### Email Templates
+- **Responsive Design**: Works on all email clients
+- **Brand Consistent**: Matches app's visual identity
+- **Rich Content**: Includes todo details, priority, and due dates
+- **Call-to-Action**: Direct links back to the application
+
+### User Controls
+- **Enable/Disable**: Master switch for all email notifications
+- **Selective Notifications**: Choose between reminders and overdue alerts
+- **Timing Control**: Set how many hours before due date to receive reminders
+- **Easy Management**: Settings accessible through user-friendly modal
+
+### Technical Implementation
+- **Nodemailer**: Reliable email delivery service
+- **Cron Jobs**: Automated background processing
+- **Gmail Integration**: Easy setup with Gmail SMTP
+- **Error Handling**: Robust failure management and logging
 
 ## 🎨 Frontend Architecture
 
@@ -440,12 +505,12 @@ REFRESH_TOKEN_EXPIRY=7d     # Refresh token expiry
 - [x] Responsive glassmorphism UI
 - [x] Case-insensitive filtering
 - [x] **Dark Mode Theme**: Toggle between light and dark themes with localStorage persistence
+- [x] **Email Notifications**: Automated reminders for due dates and overdue todos
 
 ### 🚧 Planned Features
 - [ ] **Todo Categories**: Organize todos into custom categories
 - [ ] **File Attachments**: Add files and images to todos
 - [ ] **Collaborative Todos**: Share todos with other users
-- [ ] **Email Notifications**: Reminders for due dates
 - [ ] **Offline Support**: PWA with offline functionality
 - [ ] **Mobile App**: React Native mobile application
 - [ ] **API Rate Limiting**: Enhanced security features

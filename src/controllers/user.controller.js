@@ -126,14 +126,53 @@ const logoutUser = asyncHandler(async (req, res) => {
 });
 
 const getCurrentUser = asyncHandler(async (req, res) => {
-  return res
-    .status(200)
-    .json(new ApiResponse(200, req.user, "User fetched successfully"));
+  return res.status(200).json(
+    new ApiResponse(200, req.user, "Current user fetched successfully")
+  );
 });
 
-export {
-  registerUser,
-  loginUser,
-  logoutUser,
-  getCurrentUser
+const updateEmailNotificationSettings = asyncHandler(async (req, res) => {
+  const { enabled, dueDateReminder, overdueNotification, reminderHours } = req.body;
+
+  const user = await User.findById(req.user._id);
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  // Update email notification settings
+  if (enabled !== undefined) user.emailNotifications.enabled = enabled;
+  if (dueDateReminder !== undefined) user.emailNotifications.dueDateReminder = dueDateReminder;
+  if (overdueNotification !== undefined) user.emailNotifications.overdueNotification = overdueNotification;
+  if (reminderHours !== undefined) {
+    if (reminderHours < 1 || reminderHours > 168) {
+      throw new ApiError(400, "Reminder hours must be between 1 and 168");
+    }
+    user.emailNotifications.reminderHours = reminderHours;
+  }
+
+  await user.save();
+
+  return res.status(200).json(
+    new ApiResponse(200, user.emailNotifications, "Email notification settings updated successfully")
+  );
+});
+
+const getEmailNotificationSettings = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  return res.status(200).json(
+    new ApiResponse(200, user.emailNotifications, "Email notification settings fetched successfully")
+  );
+});
+
+export { 
+  registerUser, 
+  loginUser, 
+  logoutUser, 
+  getCurrentUser, 
+  updateEmailNotificationSettings, 
+  getEmailNotificationSettings 
 };

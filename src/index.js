@@ -14,10 +14,12 @@ connectDB()
       console.log(`🌐 Frontend available at http://localhost:${PORT}`);
       console.log(`🔗 API available at http://localhost:${PORT}/api/v1`);
       
-      // Start notification service
+      // Start notification service after a brief delay to ensure env vars are loaded
       if (process.env.NODE_ENV !== 'test') {
-        notificationService.start();
-        console.log(`📧 Email notification service started`);
+        setTimeout(() => {
+          notificationService.start();
+          console.log(`📧 Email notification service started`);
+        }, 500);
       }
     });
   })

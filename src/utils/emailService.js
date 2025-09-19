@@ -9,6 +9,17 @@ class EmailService {
 
     initializeTransporter() {
         try {
+            // Add a small delay to ensure env vars are loaded
+            setTimeout(() => {
+                this.setupTransporter();
+            }, 100);
+        } catch (error) {
+            console.error('Failed to initialize email transporter:', error);
+        }
+    }
+
+    setupTransporter() {
+        try {
             // Debug: Log email configuration (without showing full password)
             console.log('🔍 Email Debug Info:');
             console.log('  EMAIL_SERVICE:', process.env.EMAIL_SERVICE);
@@ -39,7 +50,7 @@ class EmailService {
                 }
             });
         } catch (error) {
-            console.error('Failed to initialize email transporter:', error);
+            console.error('Failed to setup email transporter:', error);
         }
     }
 
@@ -263,4 +274,11 @@ export const getEmailService = () => {
         emailServiceInstance = new EmailService();
     }
     return emailServiceInstance;
+};
+
+// Force reinitialize email service (useful for debugging)
+export const reinitializeEmailService = () => {
+    console.log('🔄 Reinitializing email service...');
+    emailServiceInstance = null;
+    return getEmailService();
 };

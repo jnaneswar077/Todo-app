@@ -3,6 +3,9 @@ let currentUser = null;
 let accessToken = null;
 let currentPage = 1;
 let currentFilters = {};
+// Edit mode state
+let isEditMode = false;
+let editingTodoId = null;
 
 // DOM elements
 const authForms = document.getElementById('authForms');
@@ -14,6 +17,8 @@ const username = document.getElementById('username');
 const logoutBtn = document.getElementById('logoutBtn');
 const loading = document.getElementById('loading');
 const toast = document.getElementById('toast');
+// Add Todo/Edit Todo elements
+const todoSubmitBtn = document.getElementById('todoSubmitBtn');
 
 // API base URL
 const API_BASE = '/api/v1';
@@ -204,34 +209,47 @@ async function handleAddTodo(e) {
         .filter(tag => tag.length > 0);
 
     try {
-        const response = await fetch(`${API_BASE}/todos`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${accessToken}`
-            },
-            body: JSON.stringify({
-                title,
-                description,
-                priority,
-                dueDate: dueDate || undefined,
-                tags
-            })
-        });
+        let response;
+        if (isEditMode && editingTodoId) {
+            // Update existing todo
+            response = await fetch(`${API_BASE}/todos/${editingTodoId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`
+                },
+                body: JSON.stringify({ title, description, priority, dueDate: dueDate || undefined, tags })
+            });
+        } else {
+            // Create new todo
+            response = await fetch(`${API_BASE}/todos`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`
+                },
+                body: JSON.stringify({ title, description, priority, dueDate: dueDate || undefined, tags })
+            });
+        }
 
         const data = await response.json();
 
         if (data.success) {
-            showToast('Todo created successfully!', 'success');
+            const msg = isEditMode ? 'Todo updated successfully!' : 'Todo created successfully!';
+            showToast(msg, 'success');
             document.getElementById('addTodoForm').reset();
+            // Reset edit mode
+            isEditMode = false;
+            editingTodoId = null;
+            todoSubmitBtn.textContent = 'Add Todo';
             hideAddTodoForm();
             loadTodos();
         } else {
-            showToast(data.message || 'Failed to create todo', 'error');
+            showToast(data.message || (isEditMode ? 'Failed to update todo' : 'Failed to create todo'), 'error');
         }
     } catch (error) {
-        showToast('An error occurred while creating todo', 'error');
-        console.error('Create todo error:', error);
+        console.error(isEditMode ? 'Update todo error:' : 'Create todo error:', error);
+        showToast(isEditMode ? 'An error occurred while updating todo' : 'An error occurred while creating todo', 'error');
     } finally {
         showLoading(false);
     }
@@ -247,6 +265,10 @@ function hideAddTodoForm() {
     document.getElementById('addNewTodoBtn').style.display = 'block';
     document.getElementById('addTodoFormContainer').style.display = 'none';
     document.getElementById('addTodoForm').reset();
+    // Reset edit state when hiding
+    isEditMode = false;
+    editingTodoId = null;
+    if (todoSubmitBtn) todoSubmitBtn.textContent = 'Add Todo';
 }
 
 async function loadTodos(page = 1) {
@@ -422,10 +444,41 @@ async function deleteTodo(todoId) {
     }
 }
 
-function editTodo(todoId) {
-    // This would open an edit modal or form
-    // For now, we'll just show a message
-    showToast('Edit functionality coming soon!', 'info');
+async function editTodo(todoId) {
+    try {
+        showLoading(true);
+        // Fetch the todo details to populate the form
+        const response = await fetch(`${API_BASE}/todos/${todoId}`, {
+            headers: { 'Authorization': `Bearer ${accessToken}` }
+        });
+        const data = await response.json();
+        if (!data.success) {
+            showToast(data.message || 'Failed to load todo for editing', 'error');
+            return;
+        }
+
+        const todo = data.data;
+
+        // Populate form fields
+        document.getElementById('todoTitle').value = todo.title || '';
+        document.getElementById('todoDescription').value = todo.description || '';
+        document.getElementById('todoPriority').value = todo.priority || 'medium';
+        document.getElementById('todoDueDate').value = todo.dueDate ? new Date(todo.dueDate).toISOString().slice(0,10) : '';
+        document.getElementById('todoTags').value = Array.isArray(todo.tags) ? todo.tags.join(', ') : '';
+
+        // Switch to edit mode
+        isEditMode = true;
+        editingTodoId = todoId;
+        todoSubmitBtn.textContent = 'Update Todo';
+
+        // Show the form
+        showAddTodoForm();
+    } catch (err) {
+        console.error('Edit todo load error:', err);
+        showToast('An error occurred while loading todo', 'error');
+    } finally {
+        showLoading(false);
+    }
 }
 
 // Filter and Search Functions
